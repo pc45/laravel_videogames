@@ -40,7 +40,7 @@ class PopularGames extends Component
         return view('livewire.popular-games');
     }
 
-    private Function formatForview($games)
+    public Function formatForview($games)
     {
         return collect($games)->map( function($game){
             return collect($game)->merge([
