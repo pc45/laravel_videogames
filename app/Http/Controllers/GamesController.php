@@ -15,58 +15,8 @@ class GamesController extends Controller
      */
     public function index()
     {
-        $before = Carbon::now()->subMonths(6)->timestamp;
-        $after = Carbon::now()->addMonths(6)->timestamp;
-        $current = Carbon::now()->timestamp;
 
-        $highestRatedGames = Http::withHeaders(config('services.igdb'))
-        ->withBody(
-            'fields name, rating, cover.url, platforms.abbreviation;
-            where rating != null;
-            sort rating desc;
-            limit 12;'
-         ,'text/plain')
-        ->post('https://api.igdb.com/v4/games')
-        ->json();
-
-        $recentlyReviewed = Http::withHeaders(config('services.igdb'))
-            ->withBody(
-            'fields name, rating, cover.url, platforms.abbreviation,summary, rating_count;
-            where rating != null
-            & rating_count > 5;
-            sort rating desc;
-            limit 3;'
-            ,'text/plain')
-            ->post('https://api.igdb.com/v4/games')
-            ->json();
-
-        $mostAnticapated = Http::withHeaders(config('services.igdb'))
-            ->withBody(
-                'fields *, first_release_date, cover.*;
-              where(first_release_date > '.$before.'
-              & first_release_date < '.$after.');
-              sort rating desc;
-              limit 4;'
-            ,'text/plain')
-            ->post('https://api.igdb.com/v4/games')
-            ->json();
-
-        $comingSoon = Http::withHeaders(config('services.igdb'))
-            ->withBody(
-               'fields *, first_release_date, cover.*;
-            where(first_release_date > '.$current.');
-            sort first_release_date desc;
-            limit 4;'
-               ,'text/plain')
-            ->post('https://api.igdb.com/v4/games')
-            ->json();
-
-        return view('index', [
-            'popularGames' => $highestRatedGames,
-            'recentlyReviewed' => $recentlyReviewed,
-            'mostAnticipated' => $mostAnticapated,
-            'comingSoon' => $comingSoon,
-        ]);
+        return view('index');
     }
 
     /**
