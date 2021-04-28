@@ -30,9 +30,18 @@ class PopularGames extends Component
                                         ->json();
         });
 
-        //dump($this->formatForView($popularGamesUnformatted));
 
         $this->popularGames = $this->formatForView($popularGamesUnformatted);
+
+        collect($this->popularGames)->filter(function($game){
+            return $game['rating'];
+        })->each(function($game){
+            $this->emit('gameWithRatingAdded', [
+                'slug'=>$game['slug'],
+                'rating'=>$game['rating'] / 100,
+            ]);
+        });
+
     }
 
     public function render()
@@ -45,7 +54,7 @@ class PopularGames extends Component
         return collect($games)->map( function($game){
             return collect($game)->merge([
                 'coverImageURL'=>  isset($game['cover']) ? Str::replaceFirst('thumb', 'cover_big', $game['cover']['url']) : '#' ,
-                'rating'=> isset($game['rating']) ? round($game['rating']).'%' : null,
+                'rating'=> isset($game['rating']) ? round($game['rating']) : null,
                 'platforms'=>collect($game['platforms'])->pluck('abbreviation')->implode(', '),
             ]);
         });
