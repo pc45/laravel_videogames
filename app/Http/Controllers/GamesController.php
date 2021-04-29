@@ -52,13 +52,14 @@ class GamesController extends Controller
         $game = Http::withHeaders(config('services.igdb'))
                     ->withBody(
                         "fields name, cover.url, first_release_date, platforms.abbreviation, rating,
-                                  slug, involved_companies.company.name, genres.name, aggregated_rating, summary, websites.*, videos.*, screenshots.*, similar_games.cover.url, similar_games.name, similar_games.rating,similar_games.platforms.abbreviation, similar_games.slug;
+                                  slug, involved_companies.company.name, genres.name, aggregated_rating, summary,
+                                  websites.*, videos.*, screenshots.*, similar_games.cover.url, similar_games.name,
+                                  similar_games.rating,similar_games.platforms.abbreviation, similar_games.slug;
                                   where slug = \"{$slug}\";
                                   "
                         ,'text/plain')
                     ->post('https://api.igdb.com/v4/games')
                     ->json();
-
 
 
         abort_if(!$game, 404);
@@ -76,8 +77,8 @@ class GamesController extends Controller
             'platforms'=>collect($game['platforms'])->pluck('abbreviation')->implode(', '),
             'memberRating'=>isset($game['rating']) ? round($game['rating']) : '0',
             'criticRating'=>isset($game['aggregated_rating']) ? round($game['aggregated_rating']) : '0',
-            'trailer'=>isset($game['videos']) ? 'https://youtube.com/watch/'.$game['videos'][0]['video_id'] : null,
-            'screenshots'=>isset($games['screenshots']) ? collect($game['screenshots'])->map(function($screenshot){
+            'trailer'=>isset($game['videos']) ? 'https://youtube.com/embed/'.$game['videos'][0]['video_id'] : null,
+            'screenshots'=>isset($game['screenshots']) ? collect($game['screenshots'])->map(function($screenshot){
                 return [
                     'big'=>Str::replaceFirst('thumb', 'screenshot_big', $screenshot['url']),
                     'huge'=>Str::replaceFirst('thumb', 'screenshot_huge', $screenshot['url']),
